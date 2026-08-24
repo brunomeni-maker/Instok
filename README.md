@@ -119,6 +119,11 @@ Mais detalhes estão em [`design.md`](./design.md).
 - Testar o fluxo com usuários.
 - Preparar o MVP para o Demo Day.
 
+## Links do projeto
+
+- Protótipo: https://stitch.withgoogle.com/projects/6728758977419996166
+- Design System: https://www.figma.com/design/0NRAw6MEyaPSlmhyoNms5J/Untitled
+
 ## Equipe
 
 **Grupo Instok**
