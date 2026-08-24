@@ -164,3 +164,11 @@ A principal hipótese a ser validada é que consumidores valorizam saber se um p
 ## Concorrentes e alternativas
 
 Foram consideradas como alternativas os sites de lojas, ligações telefônicas, mensagens para estabelecimentos e visitas presenciais. O diferencial proposto pelo Instok é centralizar a consulta de disponibilidade e localização em uma única experiência.
+
+## Status do MVP
+
+O MVP do Instok está em fase de desenvolvimento e validação do fluxo principal de busca de produtos, consulta de disponibilidade e localização de lojas.
+
+### Próxima etapa
+
+Validar a experiência com usuários e conectar a aplicação a uma fonte de dados de estoque.
