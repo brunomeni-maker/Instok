@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Instok — Encontre onde comprar</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      instok<span>•</span>
+    </div>
+
+    <button class="location-button" id="locationButton">
+      📍 São Paulo, SP
+    </button>
+  </header>
+
+
+  <main>
+
+    <!-- ==========================================
+         TELA 1 — BUSCA
+    =========================================== -->
+    <section id="searchScreen" class="screen active">
+
+      <div class="hero">
+
+        <span class="eyebrow">
+          ENCONTRE PERTO DE VOCÊ
+        </span>
+
+        <h1>
+          Onde tem o produto que você procura?
+        </h1>
+
+        <p>
+          Pesquise um produto e descubra lojas próximas
+          com disponibilidade.
+        </p>
+
+
+        <form id="searchForm" class="search-form">
+
+          <div class="search-input">
+
+            <span>🔎</span>
+
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Ex.: tênis, fone, mochila..."
+              autocomplete="off"
+            >
+
+          </div>
+
+          <button type="submit" class="primary-button">
+            Buscar
+          </button>
+
+        </form>
+
+
+        <div class="popular-searches">
+
+          <span>Buscas populares</span>
+
+          <button
+            type="button"
+            data-query="Fone Bluetooth"
+          >
+            Fone Bluetooth
+          </button>
+
+          <button
+            type="button"
+            data-query="Tênis esportivo"
+          >
+            Tênis esportivo
+          </button>
+
+          <button
+            type="button"
+            data-query="Mochila"
+          >
+            Mochila
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="info-box">
+
+        <div class="info-icon">
+          ✓
+        </div>
+
+        <div>
+
+          <strong>
+            Mais praticidade
+          </strong>
+
+          <p>
+            Veja a disponibilidade antes de sair de casa.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ==========================================
+         TELA 2 — RESULTADOS
+    =========================================== -->
+
+    <section id="resultsScreen" class="screen">
+
+      <div class="screen-header">
+
+        <button
+          class="back-button"
+          data-back="searchScreen"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <span class="eyebrow">
+            RESULTADOS
+          </span>
+
+          <h2 id="resultsTitle">
+            Lojas encontradas
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="results-toolbar">
+
+        <span id="resultCount">
+          3 lojas encontradas
+        </span>
+
+        <select id="distanceFilter">
+
+          <option value="all">
+            Todas as distâncias
+          </option>
+
+          <option value="2">
+            Até 2 km
+          </option>
+
+          <option value="5">
+            Até 5 km
+          </option>
+
+          <option value="10">
+            Até 10 km
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div id="storeList" class="store-list"></div>
+
+    </section>
+
+
+
+    <!-- ==========================================
+         TELA 3 — DETALHES DA LOJA
+    =========================================== -->
+
+    <section id="detailScreen" class="screen">
+
+      <div class="screen-header">
+
+        <button
+          class="back-button"
+          data-back="resultsScreen"
+        >
+          ←
+        </button>
+
+        <div>
+
+          <span class="eyebrow">
+            DETALHES DA LOJA
+          </span>
+
+          <h2 id="detailStoreName">
+            Loja
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="detail-card">
+
+        <div class="detail-header">
+
+          <div
+            class="store-avatar"
+            id="detailAvatar"
+          >
+            L
+          </div>
+
+
+          <div>
+
+            <span class="available-badge">
+              ● Produto disponível
+            </span>
+
+            <h3 id="detailProduct">
+              Produto
+            </h3>
+
+            <p id="detailUpdated">
+              Atualizado há poucos minutos
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="detail-information">
+
+
+          <div class="detail-row">
+
+            <div class="detail-icon">
+              📍
+            </div>
+
+            <div>
+
+              <small>
+                Endereço
+              </small>
+
+              <strong id="detailAddress">
+                —
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <div class="detail-icon">
+              ↔
+            </div>
+
+            <div>
+
+              <small>
+                Distância
+              </small>
+
+              <strong id="detailDistance">
+                —
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <div class="detail-icon">
+              R$
+            </div>
+
+            <div>
+
+              <small>
+                Preço encontrado
+              </small>
+
+              <strong id="detailPrice">
+                —
+              </strong>
+
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+        <button
+          id="mapButton"
+          class="primary-button full-width"
+        >
+          Ver localização
+        </button>
+
+
+        <button
+          class="secondary-button full-width"
+          data-back="resultsScreen"
+        >
+          Escolher outra loja
+        </button>
+
+      </div>
+
+
+      <div class="notice">
+
+        <strong>
+          Confira antes de sair
+        </strong>
+
+        <p>
+          O estoque pode mudar.
+          Recomendamos confirmar a disponibilidade
+          com a loja.
+        </p>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <strong>
+      Instok
+    </strong>
+
+    <span>
+      Encontre. Compare. Vá até a loja.
+    </span>
+
+  </footer>
+
+
+  <div
+    id="toast"
+    class="toast"
+  ></div>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
