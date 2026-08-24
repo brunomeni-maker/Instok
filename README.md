@@ -124,6 +124,10 @@ Mais detalhes estão em [`design.md`](./design.md).
 - Protótipo: https://stitch.withgoogle.com/projects/6728758977419996166
 - Design System: https://www.figma.com/design/0NRAw6MEyaPSlmhyoNms5J/Untitled
 
+## Desenvolvimento
+
+O projeto está sendo desenvolvido em etapas, começando pela definição do problema, prototipação da experiência e documentação do produto.
+
 ## Equipe
 
 **Grupo Instok**
