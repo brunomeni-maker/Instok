@@ -378,13 +378,95 @@ function openStore(storeId) {
 
 searchForm.addEventListener(
   "submit",
-  function(event) {
+  async function(event) {
 
     event.preventDefault();
 
-    searchProduct(
-      searchInput.value
-    );
+    const query = searchInput.value.trim();
+
+    if (!query) {
+      showToast("Digite um produto para pesquisar.");
+      return;
+    }
+
+    showToast("A IA está entendendo sua busca...");
+
+    try {
+
+      const response = await fetch("/api/interpretar-busca", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          query: query
+        })
+      });
+
+
+      const data = await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error || "Erro ao interpretar busca"
+        );
+
+      }
+
+
+      console.log(
+        "Resultado da IA:",
+        data
+      );
+
+
+      let produtoInterpretado =
+        data.produto || query;
+
+
+      if (data.marca) {
+
+        produtoInterpretado =
+          data.marca + " " + produtoInterpretado;
+
+      }
+
+
+      if (data.preco_max) {
+
+        showToast(
+          `IA entendeu: ${produtoInterpretado}, até R$ ${data.preco_max}`
+        );
+
+      } else {
+
+        showToast(
+          `IA entendeu: ${produtoInterpretado}`
+        );
+
+      }
+
+
+      searchProduct(
+        produtoInterpretado
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showToast(
+        "Não foi possível usar a IA. Fazendo busca normal."
+      );
+
+      searchProduct(query);
+
+    }
 
   }
 );
