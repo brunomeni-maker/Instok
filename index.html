@@ -375,7 +375,54 @@
     class="toast"
   ></div>
 
+<div id="clerk-login"></div>
 
+<script>
+  window.addEventListener("load", async () => {
+    try {
+      const response = await fetch("/api/clerk-key");
+      const data = await response.json();
+
+      const publishableKey = data.publishableKey;
+      const clerkDomain = atob(publishableKey.split("_")[2]).slice(0, -1);
+
+      const uiScript = document.createElement("script");
+      uiScript.src = `https://${clerkDomain}/npm/@clerk/ui@1/dist/ui.browser.js`;
+      uiScript.crossOrigin = "anonymous";
+
+      uiScript.onload = () => {
+        const clerkScript = document.createElement("script");
+        clerkScript.src = `https://${clerkDomain}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`;
+        clerkScript.crossOrigin = "anonymous";
+        clerkScript.setAttribute("data-clerk-publishable-key", publishableKey);
+
+        clerkScript.onload = async () => {
+          await Clerk.load({
+            ui: { ClerkUI: window.__internal_ClerkUICtor }
+          });
+
+          const loginArea = document.getElementById("clerk-login");
+
+          if (Clerk.isSignedIn) {
+            Clerk.mountUserButton(loginArea);
+          } else {
+            const button = document.createElement("button");
+            button.textContent = "Entrar com Google";
+            button.onclick = () => Clerk.openSignIn();
+            loginArea.appendChild(button);
+          }
+        };
+
+        document.head.appendChild(clerkScript);
+      };
+
+      document.head.appendChild(uiScript);
+
+    } catch (error) {
+      console.error("Erro ao carregar Clerk:", error);
+    }
+  });
+</script>
   <script src="script.js"></script>
 
 </body>
