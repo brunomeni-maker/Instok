@@ -6,7 +6,11 @@ const app = express();
 
 app.use(express.json());
 app.use(express.static("."));
-
+app.get("/api/clerk-key", (req, res) => {
+  res.json({
+    publishableKey: process.env.CLERK_PUBLISHABLE_KEY
+  });
+});
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
