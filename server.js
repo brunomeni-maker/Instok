@@ -3,6 +3,10 @@ const OpenAI = require("openai");
 require("dotenv").config();
 
 const app = express();
+app.use((req, res, next) => {
+  console.log("REQUISICAO:", req.method, req.originalUrl);
+  next();
+});
 
 app.use(express.json());
 app.get("/robots.txt", (req, res) => {
