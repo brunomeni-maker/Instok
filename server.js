@@ -5,6 +5,17 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
+app.get("/robots.txt", (req, res) => {
+  res.sendFile(__dirname + "/robots.txt");
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  res.sendFile(__dirname + "/sitemap.xml");
+});
+
+app.get("/llms.txt", (req, res) => {
+  res.sendFile(__dirname + "/llms.txt");
+});
 app.use(express.static("."));
 app.get("/api/clerk-key", (req, res) => {
   res.json({
