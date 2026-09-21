@@ -6,7 +6,6 @@ const app = express();
 
 app.use(express.json());
 app.get("/robots.txt", (req, res) => {
-app.get("/robots.txt", (req, res) => {
   res.type("text/plain").send(
 `User-agent: *
 Allow: /
