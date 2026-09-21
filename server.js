@@ -6,15 +6,46 @@ const app = express();
 
 app.use(express.json());
 app.get("/robots.txt", (req, res) => {
-  res.sendFile(__dirname + "/robots.txt");
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain").send(
+`User-agent: *
+Allow: /
+
+Sitemap: https://instok-jj72.onrender.com/sitemap.xml`
+  );
 });
 
 app.get("/sitemap.xml", (req, res) => {
-  res.sendFile(__dirname + "/sitemap.xml");
+  res.type("application/xml").send(
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://instok-jj72.onrender.com/</loc>
+  </url>
+</urlset>`
+  );
 });
 
 app.get("/llms.txt", (req, res) => {
-  res.sendFile(__dirname + "/llms.txt");
+  res.type("text/plain").send(
+`# Instok
+
+Instok é uma aplicação que ajuda usuários a encontrar produtos disponíveis em lojas físicas próximas.
+
+## Funcionalidades
+
+- Pesquisa de produtos
+- Identificação de lojas com disponibilidade
+- Comparação de distância entre lojas
+- Visualização de preço e endereço
+- Busca interpretada com inteligência artificial
+- Login com Google
+- Pagamento online
+
+## Site
+
+https://instok-jj72.onrender.com/`
+  );
 });
 app.use(express.static("."));
 app.get("/api/clerk-key", (req, res) => {
