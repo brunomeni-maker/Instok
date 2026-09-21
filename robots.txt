@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://instok-jj72.onrender.com/sitemap.xml
