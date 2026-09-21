@@ -1,0 +1,17 @@
+# Instok
+
+Instok é uma aplicação que ajuda usuários a encontrar produtos disponíveis em lojas físicas próximas.
+
+## Funcionalidades
+
+- Pesquisa de produtos
+- Identificação de lojas com disponibilidade
+- Comparação de distância entre lojas
+- Visualização de preço e endereço
+- Busca interpretada com inteligência artificial
+- Login com Google
+- Pagamento online
+
+## Site
+
+https://instok-jj72.onrender.com/
