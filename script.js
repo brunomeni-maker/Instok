@@ -5,11 +5,11 @@
 const stores = [
   {
     id: 1,
-    name: "Tech Center",
+    name: "Centauro",
     address: "Av. Paulista, 1200 — Bela Vista",
     distance: 1.2,
-    price: 189.90,
-    initial: "T",
+    price: 529.90,
+    initial: "42",
     updated: "Atualizado há 8 min"
   },
 
@@ -18,8 +18,8 @@ const stores = [
     name: "Shopping Central",
     address: "Rua Augusta, 850 — Consolação",
     distance: 2.8,
-    price: 199.90,
-    initial: "S",
+    price: 499.00,
+    initial: "42",
     updated: "Atualizado há 14 min"
   },
 
@@ -28,8 +28,8 @@ const stores = [
     name: "Mega Store",
     address: "Av. Ibirapuera, 3100 — Moema",
     distance: 5.6,
-    price: 179.90,
-    initial: "M",
+    price: 515.00,
+    initial: "42",
     updated: "Atualizado há 21 min"
   }
 ];
