@@ -9,7 +9,7 @@ const stores = [
     address: "Av. Paulista, 1200 — Bela Vista",
     distance: 1.2,
     price: 529.90,
-    initial: "42",
+    initial: "C",
     updated: "Atualizado há 8 min"
   },
 
@@ -19,17 +19,17 @@ const stores = [
     address: "Rua Augusta, 850 — Consolação",
     distance: 2.8,
     price: 499.00,
-    initial: "42",
+    initial: "S",
     updated: "Atualizado há 14 min"
   },
 
   {
     id: 3,
-    name: "Mega Store",
+    name: "Nike",
     address: "Av. Ibirapuera, 3100 — Moema",
     distance: 5.6,
     price: 515.00,
-    initial: "42",
+    initial: "N",
     updated: "Atualizado há 21 min"
   }
 ];
