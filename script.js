@@ -2,7 +2,7 @@
 // DADOS SIMULADOS DO INSTOK
 // ==========================================
 
-const stores = [
+let stores = [
   {
     id: 1,
     name: "Centauro",
@@ -116,6 +116,36 @@ function formatDistance(distance) {
     .replace(".", ",") + " km";
 
 }
+// ==========================================
+// CALCULAR DISTÂNCIA REAL
+// ==========================================
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+
+  const R = 6371;
+
+  const toRad = function(value) {
+    return value * Math.PI / 180;
+  };
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+
+  const c =
+    2 * Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    );
+
+  return R * c;
+}
 
 
 // ==========================================
@@ -217,9 +247,9 @@ function renderStores() {
               </h3>
 
 
-              <span class="available-badge">
-                ● Disponível
-              </span>
+             <span class="available-badge">
+  ● Loja encontrada
+</span>
 
 
               <p>
@@ -227,11 +257,15 @@ function renderStores() {
               </p>
 
 
-              <p>
-                ${store.updated}
-                ·
-                R$ ${formatPrice(store.price)}
-              </p>
+ <p>
+  ${store.updated || "Dados do OpenStreetMap"}
+  ·
+  ${
+    store.price != null
+      ? "R$ " + formatPrice(store.price)
+      : "Consulte disponibilidade"
+  }
+</p>
 
             </div>
 
@@ -267,42 +301,122 @@ function renderStores() {
 // PESQUISAR PRODUTO
 // ==========================================
 
-function searchProduct(product) {
+async function searchProduct(product) {
 
   const cleanProduct =
     product.trim();
 
-
-  if (cleanProduct === "") {
-
-    currentProduct =
-      "Fone Bluetooth";
-
-  } else {
-
-    currentProduct =
-      cleanProduct;
-
+  if (!cleanProduct) {
+    showToast(
+      "Digite um produto para pesquisar."
+    );
+    return;
   }
 
+  if (!userLocation) {
+    showToast(
+      "Clique primeiro em 📍 São Paulo, SP para permitir sua localização."
+    );
+    return;
+  }
+
+  currentProduct =
+    cleanProduct;
 
   searchInput.value =
     currentProduct;
 
-
   resultsTitle.textContent =
     `Onde encontrar "${currentProduct}"`;
-
 
   distanceFilter.value =
     "all";
 
+  showToast(
+    "Buscando lojas reais próximas..."
+  );
 
-  renderStores();
+  try {
 
+    const response =
+      await fetch(
+        `/api/lojas-proximas?lat=${userLocation.latitude}&lon=${userLocation.longitude}&produto=${encodeURIComponent(currentProduct)}`
+      );
 
-  showScreen("resultsScreen");
+    const data =
+      await response.json();
 
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+        "Erro ao buscar lojas."
+      );
+    }
+
+    stores =
+      data.lojas.map(function(store) {
+
+        return {
+          id: store.id,
+          name: store.name,
+          address: store.address,
+
+          distance:
+            calculateDistance(
+              userLocation.latitude,
+              userLocation.longitude,
+              store.latitude,
+              store.longitude
+            ),
+
+          price: null,
+
+          initial:
+            store.name
+              .charAt(0)
+              .toUpperCase(),
+
+          updated:
+            "Dados do OpenStreetMap",
+
+          latitude:
+            store.latitude,
+
+          longitude:
+            store.longitude
+        };
+
+      });
+
+    renderStores();
+
+    showScreen(
+      "resultsScreen"
+    );
+
+    showToast(
+      stores.length +
+      (stores.length === 1
+        ? " loja real encontrada."
+        : " lojas reais encontradas.")
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    stores = [];
+
+    renderStores();
+
+    showScreen(
+      "resultsScreen"
+    );
+
+    showToast(
+      "Não foi possível buscar lojas próximas."
+    );
+  }
 }
 
 
@@ -361,10 +475,12 @@ function openStore(storeId) {
     formatDistance(store.distance);
 
 
-  document.getElementById(
-    "detailPrice"
-  ).textContent =
-    "R$ " + formatPrice(store.price);
+document.getElementById(
+  "detailPrice"
+).textContent =
+  store.price != null
+    ? "R$ " + formatPrice(store.price)
+    : "Consulte disponibilidade";
 
 
   showScreen("detailScreen");
@@ -451,9 +567,9 @@ searchForm.addEventListener(
       }
 
 
-      searchProduct(
-        produtoInterpretado
-      );
+    searchProduct(
+  query
+);
 
 
     } catch (error) {
@@ -545,26 +661,63 @@ backButtons.forEach(
 
 
 // ==========================================
-// LOCALIZAÇÃO
+// LOCALIZAÇÃO REAL
 // ==========================================
+
+let userLocation = null;
 
 const locationButton =
   document.getElementById(
     "locationButton"
   );
 
-
 locationButton.addEventListener(
   "click",
   function() {
 
+    if (!navigator.geolocation) {
+      showToast(
+        "Seu navegador não permite localização."
+      );
+      return;
+    }
+
     showToast(
-      "Localização definida como São Paulo, SP."
+      "Buscando sua localização..."
     );
 
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+
+        userLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+
+        locationButton.textContent =
+          "📍 Localização atual";
+
+        showToast(
+          "Localização encontrada."
+        );
+
+        console.log(
+          "Localização:",
+          userLocation
+        );
+      },
+
+      function(error) {
+
+        console.error(error);
+
+        showToast(
+          "Não foi possível acessar sua localização."
+        );
+      }
+    );
   }
 );
-
 
 // ==========================================
 // BOTÃO MAPA
