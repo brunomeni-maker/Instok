@@ -284,6 +284,114 @@ if (!data) {
     });
   }
 });
+// ==========================================
+// BUSCAR LOJAS REAIS - GEOAPIFY
+// ==========================================
+
+app.get("/api/lojas-geoapify", async (req, res) => {
+  try {
+    const { lat, lon, produto } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({
+        error: "Localização não informada."
+      });
+    }
+
+    const apiKey = process.env.GEOAPIFY_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "Geoapify não configurado."
+      });
+    }
+
+    const busca = (produto || "").toLowerCase();
+
+    let categories = "commercial.elektronics";
+
+    if (
+      busca.includes("tênis") ||
+      busca.includes("tenis") ||
+      busca.includes("nike") ||
+      busca.includes("corrida")
+    ) {
+      categories =
+        "commercial.clothing.shoes,commercial.clothing.sport,commercial.outdoor_and_sport";
+    }
+
+    if (
+      busca.includes("mochila") ||
+      busca.includes("bolsa")
+    ) {
+      categories =
+        "commercial.bag,commercial.department_store";
+    }
+
+    const radius = 15000;
+
+    const params = new URLSearchParams({
+      categories: categories,
+      filter: `circle:${lon},${lat},${radius}`,
+      bias: `proximity:${lon},${lat}`,
+      limit: "15",
+      lang: "pt",
+      apiKey: apiKey
+    });
+
+    const response = await fetch(
+      `https://api.geoapify.com/v2/places?${params}`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Geoapify respondeu ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+
+    const lojas = data.features
+      .map(function(feature) {
+
+        const p = feature.properties;
+
+        if (!p.name) {
+          return null;
+        }
+
+        return {
+          id: p.place_id,
+          name: p.name,
+          address:
+            p.formatted ||
+            "Endereço não informado",
+
+          distance:
+            p.distance != null
+              ? p.distance / 1000
+              : null,
+
+          latitude: p.lat,
+          longitude: p.lon
+        };
+      })
+      .filter(Boolean);
+
+    res.json({ lojas });
+
+  } catch (error) {
+    console.error(
+      "Erro Geoapify:",
+      error
+    );
+
+    res.status(500).json({
+      error:
+        "Não foi possível buscar lojas próximas."
+    });
+  }
+});
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
