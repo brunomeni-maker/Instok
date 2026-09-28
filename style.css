@@ -645,3 +645,14 @@ footer {
   }
 
 }
+
+.detail-card a.primary-button.full-width {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-decoration: none;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
