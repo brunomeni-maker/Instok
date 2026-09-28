@@ -348,7 +348,7 @@ function renderStores() {
             <button
               class="store-view-button"
               type="button"
-              onclick="openStore(${store.id})"
+onclick='openStore(${JSON.stringify(store.id)})'
             >
 
               Ver loja
