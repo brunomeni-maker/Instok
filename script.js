@@ -146,7 +146,75 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
   return R * c;
 }
+// ==========================================
+// BUSCAR LOJAS REAIS DIRETO NO OPENSTREETMAP
+// ==========================================
 
+async function buscarLojasOSM(produto) {
+
+  const busca = produto.toLowerCase();
+
+  let tipos = [
+    '["shop"="electronics"]',
+    '["shop"="computer"]',
+    '["shop"="mobile_phone"]',
+    '["shop"="department_store"]'
+  ];
+
+  if (
+    busca.includes("tenis") ||
+    busca.includes("tênis") ||
+    busca.includes("nike") ||
+    busca.includes("corrida")
+  ) {
+    tipos = [
+      '["shop"="sports"]',
+      '["shop"="shoes"]'
+    ];
+  }
+
+  if (
+    busca.includes("mochila") ||
+    busca.includes("bolsa")
+  ) {
+    tipos = [
+      '["shop"="bag"]',
+      '["shop"="department_store"]'
+    ];
+  }
+
+  const raio = 15000;
+
+  const consultas = tipos.map(tipo => `
+    node(around:${raio},${userLocation.latitude},${userLocation.longitude})${tipo};
+    way(around:${raio},${userLocation.latitude},${userLocation.longitude})${tipo};
+  `).join("");
+
+  const query = `
+    [out:json][timeout:25];
+    (
+      ${consultas}
+    );
+    out center tags;
+  `;
+
+  const response = await fetch(
+    "https://overpass-api.de/api/interpreter",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "data=" + encodeURIComponent(query)
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("OpenStreetMap não respondeu.");
+  }
+
+  return await response.json();
+}
 
 // ==========================================
 // RENDERIZAR LOJAS
@@ -338,55 +406,73 @@ async function searchProduct(product) {
 
   try {
 
-    const response =
-      await fetch(
-        `/api/lojas-proximas?lat=${userLocation.latitude}&lon=${userLocation.longitude}&produto=${encodeURIComponent(currentProduct)}`
-      );
+ const data =
+  await buscarLojasOSM(currentProduct);
 
-    const data =
-      await response.json();
+stores =
+  data.elements
+    .map(function(item) {
 
-    if (!response.ok) {
-      throw new Error(
-        data.error ||
-        "Erro ao buscar lojas."
-      );
-    }
+      const latitude =
+        item.lat || item.center?.lat;
 
-    stores =
-      data.lojas.map(function(store) {
+      const longitude =
+        item.lon || item.center?.lon;
 
-        return {
-          id: store.id,
-          name: store.name,
-          address: store.address,
+      if (
+        !latitude ||
+        !longitude ||
+        !item.tags?.name
+      ) {
+        return null;
+      }
 
-          distance:
-            calculateDistance(
-              userLocation.latitude,
-              userLocation.longitude,
-              store.latitude,
-              store.longitude
-            ),
+      const endereco = [
+        item.tags["addr:street"],
+        item.tags["addr:housenumber"],
+        item.tags["addr:suburb"]
+      ]
+        .filter(Boolean)
+        .join(", ");
 
-          price: null,
+      return {
+        id: item.id,
 
-          initial:
-            store.name
-              .charAt(0)
-              .toUpperCase(),
+        name:
+          item.tags.name,
 
-          updated:
-            "Dados do OpenStreetMap",
+        address:
+          endereco ||
+          "Endereço disponível no mapa",
 
-          latitude:
-            store.latitude,
+        distance:
+          calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            latitude,
+            longitude
+          ),
 
-          longitude:
-            store.longitude
-        };
+        price: null,
 
-      });
+        initial:
+          item.tags.name
+            .charAt(0)
+            .toUpperCase(),
+
+        updated:
+          "Dados do OpenStreetMap",
+
+        latitude:
+          latitude,
+
+        longitude:
+          longitude
+      };
+
+    })
+    .filter(Boolean)
+    .slice(0, 15);
 
     renderStores();
 
