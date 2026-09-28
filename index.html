@@ -22,15 +22,30 @@
 <body>
 
   <!-- HEADER -->
-  <header class="header">
-    <div class="logo">
-      instok<span>•</span>
-    </div>
+<header class="header">
 
-    <button class="location-button" id="locationButton">
+  <button
+    id="homeLogo"
+    class="logo logo-button"
+    type="button"
+  >
+    instok<span>•</span>
+  </button>
+
+  <div class="header-actions">
+
+    <div id="clerk-login"></div>
+
+    <button
+      class="location-button"
+      id="locationButton"
+    >
       📍 São Paulo, SP
     </button>
-  </header>
+
+  </div>
+
+</header>
 
 
   <main>
@@ -392,7 +407,6 @@
     class="toast"
   ></div>
 
-<div id="clerk-login"></div>
 
 <script>
   window.addEventListener("load", async () => {
