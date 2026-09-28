@@ -41,7 +41,7 @@ let stores = [
 
 let currentProduct = "Fone Bluetooth";
 
-
+let currentStore = null;
 // ==========================================
 // ELEMENTOS DA PÁGINA
 // ==========================================
@@ -507,6 +507,7 @@ function openStore(storeId) {
   if (!store) {
     return;
   }
+  currentStore = store;
 
 
   document.getElementById(
@@ -803,10 +804,15 @@ mapButton.addEventListener(
   "click",
   function() {
 
-    showToast(
-      "Localização selecionada. A integração com mapas será adicionada posteriormente."
-    );
+    if (!currentStore) {
+      showToast("Nenhuma loja selecionada.");
+      return;
+    }
 
+    const url =
+      `https://www.google.com/maps/search/?api=1&query=${currentStore.latitude},${currentStore.longitude}`;
+
+    window.open(url, "_blank");
   }
 );
 
