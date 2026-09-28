@@ -121,11 +121,13 @@ app.get("/api/lojas-proximas", async (req, res) => {
 
     const busca = (produto || "").toLowerCase();
 
-    let tipos = [
-      '["shop"="electronics"]',
-      '["shop"="computer"]',
-      '["shop"="mobile_phone"]'
-    ];
+let tipos = [
+  '["shop"="electronics"]',
+  '["shop"="computer"]',
+  '["shop"="mobile_phone"]',
+  '["shop"="department_store"]',
+  '["shop"="appliance"]'
+];
 
     if (
       busca.includes("tenis") ||
@@ -149,7 +151,7 @@ app.get("/api/lojas-proximas", async (req, res) => {
       ];
     }
 
-    const raio = 8000;
+   const raio = 15000;
 
     const consultas = tipos.map(tipo => `
       node(around:${raio},${lat},${lon})${tipo};
