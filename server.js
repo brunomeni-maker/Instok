@@ -104,7 +104,130 @@ ${query}
     });
   }
 });
+// ==========================================
+// BUSCAR LOJAS REAIS PRÓXIMAS
+// OpenStreetMap + Overpass
+// ==========================================
 
+app.get("/api/lojas-proximas", async (req, res) => {
+  try {
+    const { lat, lon, produto } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({
+        error: "Localização não informada."
+      });
+    }
+
+    const busca = (produto || "").toLowerCase();
+
+    let tipos = [
+      '["shop"="electronics"]',
+      '["shop"="computer"]',
+      '["shop"="mobile_phone"]'
+    ];
+
+    if (
+      busca.includes("tenis") ||
+      busca.includes("tênis") ||
+      busca.includes("nike") ||
+      busca.includes("corrida")
+    ) {
+      tipos = [
+        '["shop"="sports"]',
+        '["shop"="shoes"]'
+      ];
+    }
+
+    if (
+      busca.includes("mochila") ||
+      busca.includes("bolsa")
+    ) {
+      tipos = [
+        '["shop"="bag"]',
+        '["shop"="department_store"]'
+      ];
+    }
+
+    const raio = 8000;
+
+    const consultas = tipos.map(tipo => `
+      node(around:${raio},${lat},${lon})${tipo};
+      way(around:${raio},${lat},${lon})${tipo};
+      relation(around:${raio},${lat},${lon})${tipo};
+    `).join("");
+
+    const query = `
+      [out:json][timeout:25];
+      (
+        ${consultas}
+      );
+      out center tags;
+    `;
+
+    const response = await fetch(
+      "https://overpass-api.de/api/interpreter",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "data=" + encodeURIComponent(query)
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Erro no OpenStreetMap");
+    }
+
+    const data = await response.json();
+
+    const lojas = data.elements
+      .map(item => {
+        const latitude =
+          item.lat || item.center?.lat;
+
+        const longitude =
+          item.lon || item.center?.lon;
+
+        if (
+          !latitude ||
+          !longitude ||
+          !item.tags?.name
+        ) {
+          return null;
+        }
+
+        const endereco = [
+          item.tags["addr:street"],
+          item.tags["addr:housenumber"],
+          item.tags["addr:suburb"]
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+        return {
+          id: item.id,
+          name: item.tags.name,
+          address:
+            endereco || "Endereço disponível no mapa",
+          latitude,
+          longitude
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 15);
+
+    res.json({ lojas });
+
+  } catch (error) {
+    console.error("Erro ao buscar lojas:", error);
+
+    res.status(500).json({
+      error: "Não foi possível buscar lojas próximas."
+    });
+  }
+});
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
