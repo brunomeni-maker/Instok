@@ -406,73 +406,57 @@ async function searchProduct(product) {
 
   try {
 
- const data =
-  await buscarLojasOSM(currentProduct);
+const response =
+  await fetch(
+    `/api/lojas-geoapify?lat=${userLocation.latitude}&lon=${userLocation.longitude}&produto=${encodeURIComponent(currentProduct)}`
+  );
+
+const data =
+  await response.json();
+
+if (!response.ok) {
+  throw new Error(
+    data.error ||
+    "Erro ao buscar lojas."
+  );
+}
 
 stores =
-  data.elements
-    .map(function(item) {
+  data.lojas.map(function(store) {
 
-      const latitude =
-        item.lat || item.center?.lat;
+    return {
+      id: store.id,
+      name: store.name,
+      address: store.address,
 
-      const longitude =
-        item.lon || item.center?.lon;
+      distance:
+        store.distance != null
+          ? store.distance
+          : calculateDistance(
+              userLocation.latitude,
+              userLocation.longitude,
+              store.latitude,
+              store.longitude
+            ),
 
-      if (
-        !latitude ||
-        !longitude ||
-        !item.tags?.name
-      ) {
-        return null;
-      }
+      price: null,
 
-      const endereco = [
-        item.tags["addr:street"],
-        item.tags["addr:housenumber"],
-        item.tags["addr:suburb"]
-      ]
-        .filter(Boolean)
-        .join(", ");
+      initial:
+        store.name
+          .charAt(0)
+          .toUpperCase(),
 
-      return {
-        id: item.id,
+      updated:
+        "Dados do Geoapify",
 
-        name:
-          item.tags.name,
+      latitude:
+        store.latitude,
 
-        address:
-          endereco ||
-          "Endereço disponível no mapa",
+      longitude:
+        store.longitude
+    };
 
-        distance:
-          calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            latitude,
-            longitude
-          ),
-
-        price: null,
-
-        initial:
-          item.tags.name
-            .charAt(0)
-            .toUpperCase(),
-
-        updated:
-          "Dados do OpenStreetMap",
-
-        latitude:
-          latitude,
-
-        longitude:
-          longitude
-      };
-
-    })
-    .filter(Boolean)
-    .slice(0, 15);
+  });
 
     renderStores();
 
