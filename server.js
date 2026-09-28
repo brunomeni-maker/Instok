@@ -167,22 +167,76 @@ let tipos = [
       out center tags;
     `;
 
+  const overpassServers = [
+  "https://overpass.private.coffee/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "https://overpass-api.de/api/interpreter"
+];
+
+let data = null;
+let lastError = null;
+
+for (const server of overpassServers) {
+
+  try {
+
+    console.log(
+      "Tentando Overpass:",
+      server
+    );
+
     const response = await fetch(
-      "https://overpass-api.de/api/interpreter",
+      server,
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
+          "Content-Type":
+            "application/x-www-form-urlencoded"
         },
-        body: "data=" + encodeURIComponent(query)
+
+        body:
+          "data=" +
+          encodeURIComponent(query),
+
+        signal:
+          AbortSignal.timeout(15000)
       }
     );
 
     if (!response.ok) {
-      throw new Error("Erro no OpenStreetMap");
+      throw new Error(
+        "HTTP " + response.status
+      );
     }
 
-    const data = await response.json();
+    data = await response.json();
+
+    console.log(
+      "Overpass funcionando:",
+      server
+    );
+
+    break;
+
+  } catch (error) {
+
+    console.error(
+      "Falha no Overpass:",
+      server,
+      error.message
+    );
+
+    lastError = error;
+  }
+}
+
+if (!data) {
+  throw lastError ||
+    new Error(
+      "Nenhum servidor do OpenStreetMap respondeu."
+    );
+}
 
     const lojas = data.elements
       .map(item => {
