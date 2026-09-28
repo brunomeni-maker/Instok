@@ -656,3 +656,27 @@ footer {
   margin-top: 12px;
   margin-bottom: 12px;
 }
+
+#clerk-login {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+#clerk-login button {
+  background: #2f66e8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  min-width: 180px;
+  min-height: 48px;
+}
+
+#clerk-login button:hover {
+  opacity: 0.92;
+}
